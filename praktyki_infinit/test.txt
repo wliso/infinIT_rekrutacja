@@ -1,0 +1,5 @@
+CREATE TABLE user (
+imie : varchar(100),
+nazwisko : varchar(100),
+wiek: int
+);
