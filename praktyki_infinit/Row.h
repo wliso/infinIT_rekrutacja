@@ -9,7 +9,6 @@ public:
 	vector<Column*> columns;
 	Row() {}
 	Row(const vector<Column*> &column) {
-		//columns = new vector<Column*>();
 		columns = column;
 	}
 	void displayRow() {

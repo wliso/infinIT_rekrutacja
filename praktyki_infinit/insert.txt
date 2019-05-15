@@ -1,0 +1,3 @@
+INSERT INTO user (
+"weronika","lisowska",22
+);

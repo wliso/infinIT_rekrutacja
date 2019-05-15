@@ -1,3 +1,4 @@
+#pragma once
 #include "pch.h"
 #include <iostream>
 #include <string>
@@ -22,17 +23,10 @@ public:
 		cout << tableName << endl;
 		for (int i = 0; i < rows.size(); i++) {
 			rows[i].displayRow();
-			//if (i = 0) i++;
+			//if (i == 0) i++;
 		}
 	}
-	//Table * operator =(const Table & prawy)
-	//{
-	//	if (&prawy != this)
-	//	{
-	//		tableName = prawy.tableName;
-	//		rows = prawy.rows;
-	//	}
-	//	return this;
-	//}
 };
+
+
 

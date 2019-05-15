@@ -1,3 +1,4 @@
+#pragma once
 #include "pch.h"
 #include <iostream>
 #include <string>
@@ -17,9 +18,11 @@ class Column {
 public:
 	virtual Type GetType() = 0;
 	//virtual ~Column() {}
+	virtual string returnSt() { return "kk"; }
 	virtual void display() {
 		cout << " ";
 	}
+
 };
 
 class Tint : public Column {
@@ -27,11 +30,15 @@ public:
 	Type GetType() { return TintT; }
 
 	int data;
+	Tint(){}
 	Tint(int tmp) {
 		data = tmp;
 	}
 	void display() {
 		cout << data;
+	}
+	string returnSt() {
+		return "Integer";
 	}
 };
 
@@ -40,8 +47,12 @@ public:
 	Type GetType() { return TboolT; }
 
 	bool data;
+	Tbool(){}
 	Tbool(bool tmp) {
 		data = tmp;
+	}
+	string returnSt() {
+		return "Bool";
 	}
 	void display() {
 		cout << data;
@@ -52,6 +63,10 @@ public:
 	Type GetType() { return TfloatT; }
 
 	float data;
+	Tfloat(){}
+	string returnSt() {
+		return "Float";
+	}
 	Tfloat(float tmp) {
 		data = tmp;
 	}
@@ -65,6 +80,9 @@ public:
 	Type GetType() { return TstringT; }
 	Tstring() {}
 	string data;
+	string returnSt() {
+		return data;
+	}
 	Tstring(string tmp) {
 		data = tmp;
 	}
@@ -72,6 +90,6 @@ public:
 		data = tmp.data;
 	}
 	void display() {
-		cout << data<< ".";
+		cout << data;
 	}
 };

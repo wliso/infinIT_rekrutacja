@@ -1,5 +1,8 @@
 CREATE TABLE user (
-imie : varchar(100),
-nazwisko : varchar(100),
-wiek: int
+imie : Varchar,
+nazwisko : Varchar,
+wiek: Integer
+);
+INSERT INTO user (
+"weronika","lisowska",22
 );

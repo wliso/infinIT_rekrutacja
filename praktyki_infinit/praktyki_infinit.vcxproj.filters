@@ -38,9 +38,18 @@
     <ClCompile Include="Table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ListTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="test.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="insert.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="select.txt">
       <Filter>Source Files</Filter>
     </Text>
   </ItemGroup>
