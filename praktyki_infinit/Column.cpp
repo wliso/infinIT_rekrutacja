@@ -19,6 +19,7 @@ public:
 	virtual Type GetType() = 0;
 	//virtual ~Column() {}
 	virtual string returnSt() { return "kk"; }
+	virtual string dataToString() { return "sth"; }
 	virtual void display() {
 		cout << " ";
 	}
@@ -34,6 +35,9 @@ public:
 	Tint(int tmp) {
 		data = tmp;
 	}
+	string dataToString() {
+		return to_string(data);
+	}
 	void display() {
 		cout << data;
 	}
@@ -47,6 +51,9 @@ public:
 	Type GetType() { return TboolT; }
 
 	bool data;
+	string dataToString() {
+		return data ? "true" : "false";
+	}
 	Tbool(){}
 	Tbool(bool tmp) {
 		data = tmp;
@@ -64,6 +71,9 @@ public:
 
 	float data;
 	Tfloat(){}
+	string dataToString() {
+		return to_string(data);
+	}
 	string returnSt() {
 		return "Float";
 	}
@@ -80,6 +90,9 @@ public:
 	Type GetType() { return TstringT; }
 	Tstring() {}
 	string data;
+	string dataToString() {
+		return data;
+	}
 	string returnSt() {
 		return data;
 	}

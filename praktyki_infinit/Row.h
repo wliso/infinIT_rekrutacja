@@ -18,5 +18,14 @@ public:
 		}
 		cout << endl;
 	}
-	
+	vector<int> findColumn(vector<string> column) {
+		vector<int> ind;
+		for (int i = 0; i < columns.size(); i++) 
+		for(int j=0;j < column.size();j++)
+		{
+			if (columns[i]->returnSt().compare(column[j]) == 0) ind.push_back(i);
+		}
+		
+		return ind;
+	}	
 };

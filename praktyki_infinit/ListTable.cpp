@@ -22,21 +22,29 @@ public:
 	}
 
 	void whichProcedure(vector<string> proc) {
-		if (proc[0].compare("CREATE") == 0) {
-			cout << " create" << endl;
-			this->create(proc);
+		if (proc.size() != 0) {
+			if (proc[0].compare("CREATE") == 0) {
+				cout << " create" << endl;
+				this->create(proc);
+			}
+			else if (proc[0].compare("INSERT") == 0) {
+				cout << "insert" << endl;
+				this->insert(proc);
+			}
+			else if (proc[0].compare("SELECT") == 0) {
+				if (proc[proc.size() - 4].compare("WHERE") == 0) {
+					cout << "select where" << endl;
+					this->selectWhere(proc);
+				}
+				else {
+					cout << "select" << endl;
+					this->select(proc);
+				}
+			}
+			else if (proc[0].compare("DROP") == 0) { cout << "srop" << endl; }
+			else if (proc[0].compare("DELETE") == 0) { cout << "delete" << endl; }
+			else cout << "there isnt such an option" << endl;
 		}
-		else if (proc[0].compare("INSERT") == 0) { 
-			cout << "insert" << endl; 
-			this->insert(proc);
-		}
-		else if (proc[0].compare("SELECT") == 0) { 
-			cout << "select" << endl; 
-			this->select(proc);
-		}
-		else if (proc[0].compare("DROP") == 0) { cout << "srop" << endl; }
-		else if (proc[0].compare("DELETE") == 0) { cout << "delete" << endl; }
-		else cout << "there isnt such an option" << endl;
 	}
 
 	void create(vector<string> proc) {
@@ -50,7 +58,6 @@ public:
 		}
 		if (!iftableAlreadyExist)
 		{
-			cout << " W CREATEEEE" << endl;
 			string tmp, tmp2;
 			vector<Column*> columns;
 			vector<Column*> columns2;
@@ -216,16 +223,97 @@ public:
 
 	void select(vector<string> proc) {
 		int tmp = 0;
+		int j = 1;
+		vector<string> columnNames;
 		for (int i = 0; i < tables.size(); i++) {
-			if (tables[i].tableName.compare(proc[3]) == 0)
+			if (tables[i].tableName.compare(proc[proc.size()-1]) == 0)
 			{
 				tmp = 1;
-				tables[i].displayTable();
+				if (proc[1].compare("*") == 0) {
+					
+					tables[i].displayTable();
+				}
+				else {
+					while (j<proc.size()-2) {
+						columnNames.push_back(proc[j]);
+						j++;
+					}
+					tables[i].displayTableColumn(columnNames);
+				}					
 			}
 		}
 		if (tmp == 0) cout << "There is no table with that name." << endl;
 	}
 
+	void selectWhere(vector<string> proc) {
+		vector<string>::iterator it = find(proc.begin(), proc.end(), "WHERE");
+		int ind = distance(proc.begin(), it);
+		int tmp = 0;
+		int j = 1;
+		vector<string> columnNames;
+		for (int i = 0; i < tables.size(); i++) {
+			if (tables[i].tableName.compare(proc[ind-1]) == 0)
+			{
+				vector<string> st;
+				st.push_back(proc[ind + 1]);
+				vector<int> numb;
+				numb = tables[i].rows[0].findColumn(st);
+				if (numb.size() != 0)
+				{
+					Column* col = whatType(tables[i].rows[1].columns[numb[0]]->returnSt());
+					Type typ = col->GetType();
+					bool correct;
+					switch (typ)
+					{
+					case TintT:
+						correct=ifint(proc[ind + 3]);
+						break;
+					case TfloatT:
+						correct=iffloat(proc[ind + 3]);
+						break;
+					case TboolT:
+						correct=ifbool(proc[ind + 3]);
+						break;
+					case TstringT:
+						correct=ifvarchar(proc[ind + 3]);
+						break;
+					}
+					tmp = 1;
+					cout << "PRZED CORRECT" << endl;
+					if (correct) {
+						cout << "PO CORRECT" << endl;
+						vector<int> row = tables[i].whichRow(proc[ind + 3], numb[0]);
+						if (row.size() != 0) {
+							if (proc[1].compare("*") == 0) {
+								cout << tables[i].tableName << endl;
+								tables[i].rows[0].displayRow();
+								for (int j = 0; j < row.size(); j++) {
+									tables[i].rows[row[j]].displayRow();
+									cout << endl;
+								}
+							}
+							else {
+								while (j < ind - 2) {
+									columnNames.push_back(proc[j]);
+									j++;
+								}
+								tables[i].rows[row[j]].columns[numb[0]]->display();
+									cout << tables[i].tableName << endl;
+									for (int j = 0; j < row.size(); j++) {
+										tables[i].rows[row[j]].columns[numb[0]]->display();
+										cout << endl;
+									}
+							}
+						}
+						else cout << "There isnt such data in this table" << endl;
+					}
+					else cout << "invalid argument after function WHERE" << endl;
+				}
+				else cout << "there isnt column with such name" << endl;
+			}
+		}
+		if (tmp == 0) cout << "There is no table with that name." << endl;
+	}
 
 	vector<string> readProcedure(string name, int & position)
 	{

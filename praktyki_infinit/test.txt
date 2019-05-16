@@ -1,8 +1,25 @@
 CREATE TABLE user (
 imie : Varchar,
 nazwisko : Varchar,
-wiek: Integer
+wiek : Integer
 );
 INSERT INTO user (
 "weronika","lisowska",22
 );
+INSERT INTO user (
+"weronika","lisowska",22
+);
+CREATE TABLE user2 (
+imie2 : Varchar,
+nazwisko2 : Varchar,
+wiek2 : Integer
+);
+INSERT INTO user2 (
+"alaal","bebebe",11
+);
+SELECT * FROM user;
+SELECT imie,wiek FROM user;
+INSERT INTO user (
+"alaal","bebebe",11
+);
+SELECT * FROM user WHERE imie = "weronika";
