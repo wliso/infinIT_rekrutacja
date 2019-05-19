@@ -1,0 +1,4 @@
+user2imie2 nazwisko2 wiek2 
+Varchar Varchar Integer 
+"alaal" "bebebe" 11 
+

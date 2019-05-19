@@ -20,10 +20,10 @@ public:
 	//virtual ~Column() {}
 	virtual string returnSt() { return "kk"; }
 	virtual string dataToString() { return "sth"; }
-	virtual ostream &display() {
-		ostream & os = cout;
-		os << " ";
-		return os;
+	virtual string display() {
+		cout << " ";
+		string tmp = " ";
+		return tmp;
 	}
 
 };
@@ -40,10 +40,10 @@ public:
 	string dataToString() {
 		return to_string(data);
 	}
-	ostream &display() {
-		ostream & os = cout;
-		os << data;
-		return os;
+	string display() {
+		cout << data;
+		string tmp = to_string(data);
+		return tmp;
 	}
 	string returnSt() {
 		return "Integer";
@@ -65,10 +65,10 @@ public:
 	string returnSt() {
 		return "Bool";
 	}
-	ostream &display() {
-		ostream & os = cout;
-		os << data;
-		return os;
+	string display() {
+		cout << data;
+		string tmp = to_string(data);
+		return tmp;
 	}
 };
 class Tfloat : public Column {
@@ -86,10 +86,10 @@ public:
 	Tfloat(float tmp) {
 		data = tmp;
 	}
-	ostream &display() {
-		ostream & os = cout;
-		os << data;
-		return os;
+	string display() {
+		cout << data;
+		string tmp = to_string(data);
+		return tmp;
 	}
 };
 
@@ -110,9 +110,8 @@ public:
 	Tstring(const Tstring &tmp) {
 		data = tmp.data;
 	}
-	ostream &display() {
-		ostream & os = cout;
-		os << data;
-		return os;
+	string display() {
+		cout << data;
+		return data;
 	}
 };

@@ -1,0 +1,8 @@
+userimie nazwisko wiek 
+Varchar Varchar Integer 
+"weronika" "lisowska" 22 
+"weronika" "lisowska" 21 
+"alaal" "bebebe" 16 
+"basia" "bansa" 14 
+"cela" "swit" 15 
+

@@ -39,6 +39,11 @@ public:
 					selectWhere(proc);
 					cout << endl << endl;
 				}
+				else if (proc[proc.size() - 3].compare("ORDER") == 0 || proc[proc.size() - 3].compare("BY") == 0) {
+					cout << "select order by" << endl;
+					selectOrderBy(proc);
+					cout << endl;
+				}
 				else {
 					cout << "select" << endl;
 					select(proc);
@@ -92,6 +97,7 @@ public:
 		Table *newTable = new Table();
 		newTable->tableName = proc[2];
 		newTable->rows = rowss;
+		newTable->writeTableToFile();
 		return *newTable;
 	}
 	void create(vector<string> proc) {
@@ -222,7 +228,7 @@ public:
 				}
 				Row *row = new Row(columns);
 				tables[ind].rows.push_back(*row);
-				tables[ind].displayTable();
+				tables[ind].writeTableToFile();
 			}
 		}
 	}
@@ -323,20 +329,61 @@ public:
 		if (tmp == 0) cout << "There is no table with that name." << endl;
 	}
 
+	void selectOrderBy(vector<string> proc) {
+		int tmp = 0;
+		int j = 1;
+		int ros = 0;
+		bool isReverse=false;
+		if (proc[proc.size() - 1].compare("DESC") == 0) {
+			isReverse = true;
+			ros = 1;
+		}
+		vector<string> columnNames;
+		vector<string> columnOrder;
+		vector<string> strings;
+		columnOrder.push_back(proc[proc.size() - 1-ros]);
+		
+		int i = findName(proc[proc.size() - 4 -ros]);
+		if (i != -1){
+			strings = tables[i].sortColumn(columnOrder,isReverse);
+				tmp = 1;
+				if (proc[1].compare("*") == 0) {
+
+					tables[i].displayTableOrder(strings,columnOrder);
+				}
+				else {
+					while (j < proc.size() - 5-ros) {
+						columnNames.push_back(proc[j]);
+						j++;
+					}
+					tables[i].displayColumnOrder(strings,columnOrder,columnNames);
+				}
+		}
+		if (tmp == 0) cout << "There is no table with that name." << endl;
+	}
+
 	void drop(vector<string> proc) {
 		int ind = findName(proc[1]);
 		if (ind == -1)
 			cout << "There is no table with such name." << endl;
 		else
+		{
 			tables.erase(tables.begin() + ind);
+			string st = tables[ind].tableName + ".txt";
+			const char* ch = st.c_str();
+			remove(ch);
+
+		}
 	}
 
 	void deleteFrom(vector<string> proc) {
 		int ind = findName(proc[2]);
 		if (ind == -1)
 			cout << "There is no table with such name." << endl;
-		else
+		else {
 			tables[ind].deleteData();
+			tables[ind].writeTableToFile();
+		}
 	}
 
 	void deleteWhere(vector<string> proc) {
@@ -360,6 +407,7 @@ public:
 					vector<int> row = tables[nam].whichRow(proc[ind + 3], numb[0]);
 					if (row.size() != 0) {
 						tables[nam].deleteRow(row);
+						tables[nam].writeTableToFile();
 					}
 					else cout << "There isnt such data in this table" << endl;
 				}
