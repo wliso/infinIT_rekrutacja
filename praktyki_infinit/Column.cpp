@@ -41,7 +41,7 @@ public:
 		return to_string(data);
 	}
 	string display() {
-		cout << data;
+		//cout << data;
 		string tmp = to_string(data);
 		return tmp;
 	}
@@ -66,7 +66,7 @@ public:
 		return "Bool";
 	}
 	string display() {
-		cout << data;
+		//cout << data;
 		string tmp = to_string(data);
 		return tmp;
 	}
@@ -87,7 +87,7 @@ public:
 		data = tmp;
 	}
 	string display() {
-		cout << data;
+		//cout << data;
 		string tmp = to_string(data);
 		return tmp;
 	}
@@ -111,7 +111,7 @@ public:
 		data = tmp.data;
 	}
 	string display() {
-		cout << data;
+		//cout << data;
 		return data;
 	}
 };

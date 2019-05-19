@@ -1,0 +1,5 @@
+BookInventory
+Title Author NumberOfCopies Price 
+"Autostopem przez galaktyke" "Douglas Adams" 3 42.000000 
+"Diuna" "Frank Herbert" 5 55.000000 
+

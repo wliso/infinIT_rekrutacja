@@ -1,4 +1,4 @@
-user2imie2 nazwisko2 wiek2 
-Varchar Varchar Integer 
+user2
+imie2 nazwisko2 wiek2 
 "alaal" "bebebe" 11 
 

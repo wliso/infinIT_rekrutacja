@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include "ListTable.cpp"
+#include "ListTable.h"
 using namespace std;
 
 

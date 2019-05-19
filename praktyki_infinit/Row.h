@@ -16,7 +16,7 @@ public:
 		string st;
 		for (int i = 0; i < columns.size(); i++) {
 			st += columns[i]->display();
-			cout << " ";
+			//cout << " ";
 			st += " ";
 		}
 		return st;

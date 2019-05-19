@@ -36,8 +36,23 @@ INSERT INTO user (
 );
 SELECT * FROM user;
 SELECT imie, wiek FROM user ORDER BY wiek;
+SELECT imie, wiek FROM user ORDER BY wiek DESC;
 DELETE FROM user WHERE wiek = 13;
 SELECT * FROM user;
 SELECT * FROM user WHERE wiek = 13;
+DROP BookInventory;
+CREATE TABLE BookInventory (
+  Title           : Varchar,
+  Author          : Varchar,
+  NumberOfCopies  : Integer,
+  Price           : Float 
+);
+INSERT INTO BookInventory 
+  ( "Autostopem przez galaktyke", "Douglas Adams", 3, 42.00 );
+INSERT INTO BookInventory ( "Diuna", "Frank Herbert", 5, 55.00 );
+INSERT INTO BookInventory ( "TO", "Stephen King", 2, 39.99 );
+DELETE FROM BookInventory WHERE Author = "Stephen King";
+SELECT * FROM BookInventory;
+
 
 

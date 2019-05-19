@@ -1,3 +1,12 @@
-INSERT INTO user (
-"weronika","lisowska",22
+CREATE TABLE user (
+imie : Varchar,
+nazwisko : Varchar,
+wiek : Integer
 );
+CREATE TABLE user2 (
+imie2 : Varchar,
+nazwisko2 : Varchar,
+wiek2 : Integer
+);
+SELECT * FROM user;
+SELECT imie,wiek FROM user;

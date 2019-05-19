@@ -1,5 +1,5 @@
-userimie nazwisko wiek 
-Varchar Varchar Integer 
+user
+imie nazwisko wiek 
 "weronika" "lisowska" 22 
 "weronika" "lisowska" 21 
 "alaal" "bebebe" 16 

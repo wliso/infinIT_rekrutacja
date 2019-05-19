@@ -5,72 +5,93 @@
 #include <list>
 #include <sstream>
 #include <fstream>
-#include "Table.cpp"
+#include "ListTable.h"
 using namespace std;
 
-
-
-class ListTable {
-public:
-	vector<Table> tables;
-
-	int findName(string name) {
+	int ListTable::findName(string name) {
 		for (int i = 0; i < tables.size(); i++) 
 			if (tables[i].tableName.compare(name) == 0) return i;
 			cout << "There is no table with such name" << endl;
 			return -1;
 	}
 
-	void whichProcedure(vector<string> proc) {
+	void ListTable::whichProcedure(vector<string> proc) {
 		if (proc.size() != 0) {
 			if (proc[0].compare("CREATE") == 0) {
-				cout << " create" << endl;
 				create(proc);
-				cout << endl << endl;
 			}
 			else if (proc[0].compare("INSERT") == 0) {
-				cout << "insert" << endl;
 				insert(proc);
-				cout << endl << endl;
 			}
 			else if (proc[0].compare("SELECT") == 0) {
 				if (proc[proc.size() - 4].compare("WHERE") == 0) {
-					cout << "select where" << endl;
 					selectWhere(proc);
-					cout << endl << endl;
 				}
 				else if (proc[proc.size() - 3].compare("ORDER") == 0 || proc[proc.size() - 3].compare("BY") == 0) {
-					cout << "select order by" << endl;
 					selectOrderBy(proc);
-					cout << endl;
 				}
 				else {
-					cout << "select" << endl;
 					select(proc);
-					cout << endl << endl;
 				}
+				cout << endl;
 			}
 			else if (proc[0].compare("DROP") == 0) { 
-				cout << "drop" << endl; 
 				drop(proc);
-				cout << endl << endl;
 			}
 			else if (proc[0].compare("DELETE") == 0) { 
-				cout << "delete" << endl; 
 				if (proc.size() > 3) {
-					cout << "delete where" << endl;
+
 					deleteWhere(proc);
-					cout << endl << endl;
 				}
 				else
 					deleteFrom(proc);
-				cout << endl << endl;
 			}
-			else cout << "there isnt such an option" << endl;
 		}
 	}
 
-	Table createNewTable(vector<string> proc) {
+	vector<string> ListTable::readProcedure(string name, int & position)
+	{
+		ifstream file(name);
+		file.seekg(position, ios::beg);
+		vector<string> word;
+		char let;
+		do
+		{
+			string tmp;
+			do
+			{
+				file >> noskipws >> let;
+				position++;
+				if (let == '\"') {
+					do {
+						tmp.push_back(let);
+						file >> noskipws >> let;
+						position++;
+					} while (let != '\"');	
+				} 
+				if (let != ';' and !isspace(let) and let != ',' and let != ':') {
+					tmp.push_back(let);
+				}
+			} while (!isspace(let) and let != ';' and let != ',' and let != ':');
+			if (tmp.size() != 0) word.push_back(tmp);
+		} while (let != ';');
+		return word;
+	}
+
+	void ListTable::readFromFile(string name, int& positionRead) {
+		ifstream file(name);
+		char tmp;
+		file >> tmp;
+		while (!file.eof())
+		{
+			whichProcedure(readProcedure(name, positionRead));
+			file.seekg(positionRead, ios::beg);
+			positionRead++;
+			file >> tmp;
+		}
+	}
+
+	Table ListTable::createNewTable(vector<string> proc) {
 		string tmp, tmp2;
 		vector<Column*> columns;
 		vector<Column*> columns2;
@@ -100,7 +121,7 @@ public:
 		newTable->writeTableToFile();
 		return *newTable;
 	}
-	void create(vector<string> proc) {
+	void ListTable::create(vector<string> proc) {
 		bool iftableAlreadyExist = false;
 		for (int i = 0; i < tables.size(); i++) {
 			if (tables[i].tableName.compare(proc[2]) == 0)
@@ -114,13 +135,14 @@ public:
 			tables.push_back(createNewTable(proc));
 		}
 	}
-	void printNames() {
+
+	void ListTable::printNames() {
 		for (Table const& i : tables) {
 			cout << "1. "<<i.tableName<< endl;
 		}
 	}
 
-	Column* whatType(string type) {
+	Column* ListTable::whatType(string type) {
 		if (type.compare("Boolean") == 0) {
 			return new Tbool();
 		}
@@ -135,7 +157,7 @@ public:
 		}
 	}
 
-	bool ifvarchar(string word) {
+	bool ListTable::ifvarchar(string word) {
 		string::iterator first = word.begin();
 		string::iterator last = word.end() - 1;
 		char f = *first;
@@ -144,13 +166,13 @@ public:
 		else return false;
 	}
 
-	bool ifint(string word) {
+	bool ListTable::ifint(string word) {
 		for (int i = 0; i < word.length(); i++) if (word[i] > '9' || word[i] < '0') return false;
 
 		return true;
 	}
 
-	bool iffloat(string word) {
+	bool ListTable::iffloat(string word) {
 		try {
 			float num = stof(word);
 		}
@@ -161,13 +183,13 @@ public:
 		return 1;
 	}
 
-	bool ifbool(string word) {
+	bool ListTable::ifbool(string word) {
 		if (word.compare("true") == 0 or word.compare("false") == 0)
 			return true;
 		else return false;
 	}
 
-	bool allCorrect(vector<bool> correct) {
+	bool ListTable::allCorrect(vector<bool> correct) {
 		for (int i = 0; i < correct.size(); i++) {
 			if (correct[i] == false) {
 				cout << "sprawdz poprawnosc wpisanych danych." << endl;
@@ -177,7 +199,7 @@ public:
 		return true;
 	}
 
-	vector<Column*> addTypeColumn(string word,Type typ, vector<Column*> &columns) {
+	vector<Column*> ListTable::addTypeColumn(string word,Type typ, vector<Column*> &columns) {
 		int n;
 		float f;
 		bool b;
@@ -202,12 +224,14 @@ public:
 		return columns;
 	}
 
-	void insert(vector<string> proc) {
+	void ListTable::insert(vector<string> proc) {
 		int ind = findName(proc[2]);
 		if (ind != -1) {
 			vector<bool> correct;
 			for (int i = 0; i < tables[ind].rows[0].columns.size(); i++)
+			{
 				ifTypeSwitch(proc[i + 4], ind, i, correct);
+			}
 			bool cor = allCorrect(correct);
 			int tmp = tables[ind].rows[0].columns.size();
 			if (tmp != proc.size() - 5) { 
@@ -233,7 +257,7 @@ public:
 		}
 	}
 
-	vector<bool> ifTypeSwitch(string word,int ind,int i, vector<bool> &correct) {
+	vector<bool> ListTable::ifTypeSwitch(string word,int ind,int i, vector<bool> &correct) {
 		Column* col = whatType(tables[ind].rows[1].columns[i]->returnSt());
 		Type typ = col->GetType();
 		switch (typ)
@@ -254,7 +278,7 @@ public:
 		return correct;
 	}
 
-	void select(vector<string> proc) {
+	void ListTable::select(vector<string> proc) {
 		int tmp = 0;
 		int j = 1;
 		vector<string> columnNames;
@@ -264,7 +288,7 @@ public:
 				tmp = 1;
 				if (proc[1].compare("*") == 0) {
 					
-					tables[i].displayTable();
+					cout << tables[i].displayTable();
 				}
 				else {
 					while (j<proc.size()-2) {
@@ -278,7 +302,7 @@ public:
 		if (tmp == 0) cout << "There is no table with that name." << endl;
 	}
 
-	void selectWhere(vector<string> proc) {
+	void ListTable::selectWhere(vector<string> proc) {
 		vector<string>::iterator it = find(proc.begin(), proc.end(), "WHERE");
 		int ind = distance(proc.begin(), it);
 		int tmp = 0;
@@ -301,9 +325,9 @@ public:
 					if (row.size() != 0) {
 						if (proc[1].compare("*") == 0) {
 							cout << tables[i].tableName << endl;
-							tables[i].rows[0].displayRow();
+							 cout << tables[i].rows[0].displayRow();
 							for (int j = 0; j < row.size(); j++) {
-								tables[i].rows[row[j]].displayRow();
+								cout << tables[i].rows[row[j]].displayRow();
 								cout << endl;
 							}
 						}
@@ -315,7 +339,7 @@ public:
 							tables[i].rows[row[j]].columns[numb[0]]->display();
 								cout << tables[i].tableName << endl;
 								for (int j = 0; j < row.size(); j++) {
-									tables[i].rows[row[j]].columns[numb[0]]->display();
+									cout << tables[i].rows[row[j]].columns[numb[0]]->display();
 									cout << endl;
 								}
 						}
@@ -329,7 +353,7 @@ public:
 		if (tmp == 0) cout << "There is no table with that name." << endl;
 	}
 
-	void selectOrderBy(vector<string> proc) {
+	void ListTable::selectOrderBy(vector<string> proc) {
 		int tmp = 0;
 		int j = 1;
 		int ros = 0;
@@ -362,7 +386,7 @@ public:
 		if (tmp == 0) cout << "There is no table with that name." << endl;
 	}
 
-	void drop(vector<string> proc) {
+	void ListTable::drop(vector<string> proc) {
 		int ind = findName(proc[1]);
 		if (ind == -1)
 			cout << "There is no table with such name." << endl;
@@ -376,7 +400,7 @@ public:
 		}
 	}
 
-	void deleteFrom(vector<string> proc) {
+	void ListTable::deleteFrom(vector<string> proc) {
 		int ind = findName(proc[2]);
 		if (ind == -1)
 			cout << "There is no table with such name." << endl;
@@ -386,7 +410,7 @@ public:
 		}
 	}
 
-	void deleteWhere(vector<string> proc) {
+	void ListTable::deleteWhere(vector<string> proc) {
 		int ind = 3;
 		int tmp = 0;
 		int j = 1;
@@ -417,41 +441,3 @@ public:
 		}
 		if (tmp == 0) cout << "There is no table with that name." << endl;
 	}
-
-	vector<string> readProcedure(string name, int & position)
-	{
-		ifstream file(name);
-		file.seekg(position, ios::beg);
-		vector<string> word;
-		char let;
-		do
-		{
-			string tmp;
-			do
-			{
-				file >> noskipws >> let;
-				position++;
-				if (let != ';' and !isspace(let) and let != ',' and let != ':') {
-					tmp.push_back(let);
-				}
-			} while (!isspace(let) and let != ';' and let != ',' and let != ':');
-			if (tmp.size() != 0) word.push_back(tmp);
-		} while (let != ';');
-		for (int i = 0; i < word.size(); i++)
-			cout << " " << i << " " << word[i];
-		return word;
-	}
-
-	void readFromFile(string name,int& positionRead) {
-		ifstream file(name);
-		char tmp;
-		file >> tmp;
-		while (!file.eof())
-		{			
-			whichProcedure(readProcedure(name, positionRead));
-			file.seekg(positionRead, ios::beg);
-			positionRead++;
-			file >> tmp;
-		} 
-	}
-};

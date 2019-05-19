@@ -6,52 +6,42 @@
 #include <fstream>
 #include <algorithm>
 #include <sstream>
-#include "Row.h"
+#include "Table.h"
 using namespace std;
 
-class Table {
-public:
-	string tableName;
-	vector<Row> rows;
-	Table() {}
-	//Table(string name, vector<Row> row) {
-	//	tableName = name;
-	//	rows = row;
-	//}
-	Table(const Table& table) {
-		tableName = table.tableName;
-		rows = table.rows;
-	}
-	string displayTable() {
+
+string Table:: displayTable() {
 		string st;
-		cout << tableName << endl;
+		//cout << tableName << endl;
 		st += tableName;
+		st += "\n";
 		for (int i = 0; i < rows.size(); i++) {
 			st += rows[i].displayRow();
-			cout << endl;
+			//cout << endl;
 			st += "\n";
-			//if (i == 0) i++;
+			if (i == 0) i++;
 		}
 		return st;
 	}
 
-	void displayTableOrder(vector<string> columnOrder, vector<string> column) {
+	void Table::displayTableOrder(vector<string> columnOrder, vector<string> column) {
 		vector<int> ind = rows[0].findColumn(column);
 		cout << tableName << endl;
+		cout << rows[0].displayRow();
 		if (ind.size() == column.size()) {
 			for (int i = 0; i < columnOrder.size(); i++) {
 				vector<int> order;
 				order = whichRow(columnOrder[i], ind[0]);
 				for (int s = 0; s < order.size(); s++)
 				{
-					rows[order[s]].displayRow();
+					cout << rows[order[s]].displayRow();
 					cout << endl;
 					if (s > 0) i++;
 				}
 			}			
 		}
 	}
-	void displayColumnOrder(vector<string> columnOrder, vector<string> column, vector<string> columns) {
+	void Table::displayColumnOrder(vector<string> columnOrder, vector<string> column, vector<string> columns) {
 		vector<int> ind = rows[0].findColumn(columns);
 		vector<int> ind2 = rows[0].findColumn(column);
 		if (ind.size() == columns.size()) {
@@ -62,7 +52,12 @@ public:
 				for (int o = 0; o < order.size(); o++) {
 					for (int i = 0; i < ind.size(); i++)
 					{
-						rows[order[o]].columns[ind[i]]->display();
+						if (i == 0 && j==0 && o == 0) {
+							for (int i = 0; i < ind.size(); i++)
+							cout << rows[0].columns[ind[i]]->display() << " ";
+							cout << endl;
+						}
+						cout << rows[order[o]].columns[ind[i]]->display();
 						cout << " ";
 					}
 					if (o > 0) j++;
@@ -73,7 +68,7 @@ public:
 		else cout << "There is no column with such name in this table" << endl;
 	}
 
-	vector<string> sortColumn(vector<string> column,bool isReverse) {
+	vector<string> Table::sortColumn(vector<string> column,bool isReverse) {
 		vector<string> strings;
 		vector<int> ind = rows[0].findColumn(column);
 		if (ind.size() == column.size()) {
@@ -136,7 +131,7 @@ public:
 		return strings;
 	}
 
-	void displayTableColumn(vector<string> column) {
+	void Table::displayTableColumn(vector<string> column) {
 		vector<int> ind = rows[0].findColumn(column);
 		if(ind.size()==column.size()){
 			cout << tableName << endl;
@@ -144,15 +139,16 @@ public:
 
 				for (int i = 0; i < ind.size(); i++)
 				{
-					rows[j].columns[ind[i]]->display();
+					cout << rows[j].columns[ind[i]]->display();
 					cout << " ";
 				}
 				cout << endl;
+				if (j == 0) j++;
 			}
 		}
 		else cout << "There is no column with such name in this table" << endl;
 	}
-	vector<int> whichRow(string word, int column) {
+	vector<int> Table::whichRow(string word, int column) {
 		vector<int> roww;
 		for (int i = 2; i < rows.size(); i++) {
 			if (rows[i].columns[column]->dataToString().compare(word) == 0)
@@ -160,22 +156,29 @@ public:
 		}
 		return roww;
 	}
-	void deleteRow(vector<int> numRow) {
+	void Table::deleteRow(vector<int> numRow) {
 		for (int i = numRow.size()-1; i >=0 ; i--) {
 			rows.erase(rows.begin() + numRow[i]);
 		}
 	}
-	void deleteData() {
+	void Table::deleteData() {
 		int size = rows.size();
 		for (int i = 2; i < size; i++)
 			rows.pop_back();
 	}
-	void writeTableToFile() {
+	void Table::writeTableToFile() {
 		string name = tableName + ".txt";
 		ofstream file(name);
 
 		if (file)
 		{
+			string st;
+			st += tableName;
+			for (int i = 0; i < rows.size(); i++) {
+				st += rows[i].displayRow();
+				st += "\n";
+				if (i == 0) i++;
+			}
 			file << displayTable() << endl;
 		}
 		else
@@ -183,7 +186,6 @@ public:
 			cout << "Error in opening file." << endl;
 		}
 	}
-};
 
 
 
