@@ -11,12 +11,14 @@ public:
 	Row(const vector<Column*> &column) {
 		columns = column;
 	}
-	void displayRow() {
+
+	ostream &displayRow() {
+		ostream & os = cout;
 		for (int i = 0; i < columns.size(); i++) {
-			columns[i]->display();
-			cout << " ";
+			os = columns[i]->display();
+			os << " ";
 		}
-		cout << endl;
+		return os;
 	}
 	vector<int> findColumn(vector<string> column) {
 		vector<int> ind;

@@ -22,4 +22,20 @@ SELECT imie,wiek FROM user;
 INSERT INTO user (
 "alaal","bebebe",11
 );
-SELECT * FROM user WHERE imie = "weronika";
+INSERT INTO user (
+"ala","dran",13
+);
+INSERT INTO user (
+"basia","bansa",14
+);
+INSERT INTO user (
+"cela","swit",15
+);
+INSERT INTO user (
+"daria","dri",13
+);
+SELECT * FROM user;
+DELETE FROM user WHERE wiek = 13;
+SELECT * FROM user;
+SELECT * FROM user WHERE wiek = 13;
+

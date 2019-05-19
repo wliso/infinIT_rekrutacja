@@ -17,7 +17,7 @@ public:
 	int findName(string name) {
 		for (int i = 0; i < tables.size(); i++) 
 			if (tables[i].tableName.compare(name) == 0) return i;
-			cout << "There is no list with such name" << endl;
+			cout << "There is no table with such name" << endl;
 			return -1;
 	}
 
@@ -25,28 +25,75 @@ public:
 		if (proc.size() != 0) {
 			if (proc[0].compare("CREATE") == 0) {
 				cout << " create" << endl;
-				this->create(proc);
+				create(proc);
+				cout << endl << endl;
 			}
 			else if (proc[0].compare("INSERT") == 0) {
 				cout << "insert" << endl;
-				this->insert(proc);
+				insert(proc);
+				cout << endl << endl;
 			}
 			else if (proc[0].compare("SELECT") == 0) {
 				if (proc[proc.size() - 4].compare("WHERE") == 0) {
 					cout << "select where" << endl;
-					this->selectWhere(proc);
+					selectWhere(proc);
+					cout << endl << endl;
 				}
 				else {
 					cout << "select" << endl;
-					this->select(proc);
+					select(proc);
+					cout << endl << endl;
 				}
 			}
-			else if (proc[0].compare("DROP") == 0) { cout << "srop" << endl; }
-			else if (proc[0].compare("DELETE") == 0) { cout << "delete" << endl; }
+			else if (proc[0].compare("DROP") == 0) { 
+				cout << "drop" << endl; 
+				drop(proc);
+				cout << endl << endl;
+			}
+			else if (proc[0].compare("DELETE") == 0) { 
+				cout << "delete" << endl; 
+				if (proc.size() > 3) {
+					cout << "delete where" << endl;
+					deleteWhere(proc);
+					cout << endl << endl;
+				}
+				else
+					deleteFrom(proc);
+				cout << endl << endl;
+			}
 			else cout << "there isnt such an option" << endl;
 		}
 	}
 
+	Table createNewTable(vector<string> proc) {
+		string tmp, tmp2;
+		vector<Column*> columns;
+		vector<Column*> columns2;
+		vector<Tstring> name, name2;
+		int i = 4;
+		int j = 5;
+		do {
+			name.push_back(proc[i]);
+			i = i + 2;
+			tmp = proc[i];
+
+			name2.push_back(proc[j]);
+			j = j + 2;
+		} while (tmp.compare(")"));
+		for (int i = 0; i < name.size(); i++) {
+			columns.push_back(new Tstring(name[i]));
+			columns2.push_back(new Tstring(name2[i]));
+		}
+		Row *row = new Row(columns);
+		vector<Row> rowss;
+		rowss.push_back(*row);
+		Row *row2 = new Row(columns2);
+		rowss.push_back(*row2);
+		Table *newTable = new Table();
+		newTable->tableName = proc[2];
+		newTable->rows = rowss;
+		return *newTable;
+	}
 	void create(vector<string> proc) {
 		bool iftableAlreadyExist = false;
 		for (int i = 0; i < tables.size(); i++) {
@@ -57,34 +104,8 @@ public:
 			}
 		}
 		if (!iftableAlreadyExist)
-		{
-			string tmp, tmp2;
-			vector<Column*> columns;
-			vector<Column*> columns2;
-			vector<Tstring> name, name2;
-			int i = 4;
-			int j = 5;
-			do {
-				name.push_back(proc[i]);
-				i = i + 2;
-				tmp = proc[i];
-
-				name2.push_back(proc[j]);
-				j = j + 2;
-			} while (tmp.compare(")"));
-			for (int i = 0; i < name.size(); i++) {
-				columns.push_back(new Tstring(name[i]));
-				columns2.push_back(new Tstring(name2[i]));
-			}
-			Row *row = new Row(columns);
-			vector<Row> rowss;
-			rowss.push_back(*row);
-			Row *row2 = new Row(columns2);
-			rowss.push_back(*row2);
-			Table *newtable = new Table();
-			newtable->tableName = proc[2];
-			newtable->rows = rowss;
-			tables.push_back(*newtable);
+		{			
+			tables.push_back(createNewTable(proc));
 		}
 	}
 	void printNames() {
@@ -146,9 +167,33 @@ public:
 				cout << "sprawdz poprawnosc wpisanych danych." << endl;
 				return false;
 			}
-		}
-		
+		}		
 		return true;
+	}
+
+	vector<Column*> addTypeColumn(string word,Type typ, vector<Column*> &columns) {
+		int n;
+		float f;
+		bool b;
+		switch (typ)
+		{
+		case TintT:
+			n = stoi(word);
+			columns.push_back(new Tint(n));
+			break;
+		case TfloatT:
+			f = stof(word);
+			columns.push_back(new Tfloat(f));
+			break;
+		case TboolT:
+			istringstream(word) >> b;
+			columns.push_back(new Tbool(b));
+			break;
+		case TstringT:
+			columns.push_back(new Tstring(word));
+			break;
+		}
+		return columns;
 	}
 
 	void insert(vector<string> proc) {
@@ -156,25 +201,7 @@ public:
 		if (ind != -1) {
 			vector<bool> correct;
 			for (int i = 0; i < tables[ind].rows[0].columns.size(); i++)
-			{
-				Column* col = whatType(tables[ind].rows[1].columns[i]->returnSt());
-				Type typ = col->GetType();
-				switch (typ)
-				{
-				case TintT:
-					correct.push_back(ifint(proc[i + 4]));
-					break;
-				case TfloatT:
-					correct.push_back(iffloat(proc[i + 4]));
-					break;
-				case TboolT:
-					correct.push_back(ifbool(proc[i + 4]));
-					break;
-				case TstringT:
-					correct.push_back(ifvarchar(proc[i + 4]));
-						break;
-				}
-			}
+				ifTypeSwitch(proc[i + 4], ind, i, correct);
 			bool cor = allCorrect(correct);
 			int tmp = tables[ind].rows[0].columns.size();
 			if (tmp != proc.size() - 5) { 
@@ -190,28 +217,7 @@ public:
 					Column* col = whatType(tables[ind].rows[1].columns[i]->returnSt());
 					Type typ = col->GetType();
 					names.push_back(proc[i + 4]);
-					int n;
-					float f;
-					bool b;
-				
-					switch (typ)
-					{
-					case TintT:
-						n = stoi(names[no]);
-						columns.push_back(new Tint(n));
-						break;
-					case TfloatT:
-						f = stof(names[no]);
-						columns.push_back(new Tfloat(f));
-						break;
-					case TboolT:
-						istringstream(names[no]) >> b;
-						columns.push_back(new Tbool(b));
-						break;
-					case TstringT:
-						columns.push_back(new Tstring(names[no]));
-						break;
-					}
+					addTypeColumn(names[no], typ, columns);
 					no++;
 				}
 				Row *row = new Row(columns);
@@ -219,6 +225,27 @@ public:
 				tables[ind].displayTable();
 			}
 		}
+	}
+
+	vector<bool> ifTypeSwitch(string word,int ind,int i, vector<bool> &correct) {
+		Column* col = whatType(tables[ind].rows[1].columns[i]->returnSt());
+		Type typ = col->GetType();
+		switch (typ)
+		{
+		case TintT:
+			correct.push_back(ifint(word));
+			break;
+		case TfloatT:
+			correct.push_back(iffloat(word));
+			break;
+		case TboolT:
+			correct.push_back(ifbool(word));
+			break;
+		case TstringT:
+			correct.push_back(ifvarchar(word));
+			break;
+		}
+		return correct;
 	}
 
 	void select(vector<string> proc) {
@@ -251,66 +278,94 @@ public:
 		int tmp = 0;
 		int j = 1;
 		vector<string> columnNames;
-		for (int i = 0; i < tables.size(); i++) {
-			if (tables[i].tableName.compare(proc[ind-1]) == 0)
+		int i = findName(proc[ind - 1]);
+		if (i != -1)
+		{
+			vector<string> st;
+			st.push_back(proc[ind + 1]);
+			vector<int> numb;
+			numb = tables[i].rows[0].findColumn(st);
+			if (numb.size() != 0)
 			{
-				vector<string> st;
-				st.push_back(proc[ind + 1]);
-				vector<int> numb;
-				numb = tables[i].rows[0].findColumn(st);
-				if (numb.size() != 0)
-				{
-					Column* col = whatType(tables[i].rows[1].columns[numb[0]]->returnSt());
-					Type typ = col->GetType();
-					bool correct;
-					switch (typ)
-					{
-					case TintT:
-						correct=ifint(proc[ind + 3]);
-						break;
-					case TfloatT:
-						correct=iffloat(proc[ind + 3]);
-						break;
-					case TboolT:
-						correct=ifbool(proc[ind + 3]);
-						break;
-					case TstringT:
-						correct=ifvarchar(proc[ind + 3]);
-						break;
-					}
-					tmp = 1;
-					cout << "PRZED CORRECT" << endl;
-					if (correct) {
-						cout << "PO CORRECT" << endl;
-						vector<int> row = tables[i].whichRow(proc[ind + 3], numb[0]);
-						if (row.size() != 0) {
-							if (proc[1].compare("*") == 0) {
-								cout << tables[i].tableName << endl;
-								tables[i].rows[0].displayRow();
-								for (int j = 0; j < row.size(); j++) {
-									tables[i].rows[row[j]].displayRow();
-									cout << endl;
-								}
-							}
-							else {
-								while (j < ind - 2) {
-									columnNames.push_back(proc[j]);
-									j++;
-								}
-								tables[i].rows[row[j]].columns[numb[0]]->display();
-									cout << tables[i].tableName << endl;
-									for (int j = 0; j < row.size(); j++) {
-										tables[i].rows[row[j]].columns[numb[0]]->display();
-										cout << endl;
-									}
+				vector<bool> correct;
+				ifTypeSwitch(proc[ind + 3], i, numb[0], correct);
+				tmp = 1;
+				if (correct.size()!=0) {
+					vector<int> row = tables[i].whichRow(proc[ind + 3], numb[0]);
+					if (row.size() != 0) {
+						if (proc[1].compare("*") == 0) {
+							cout << tables[i].tableName << endl;
+							tables[i].rows[0].displayRow();
+							for (int j = 0; j < row.size(); j++) {
+								tables[i].rows[row[j]].displayRow();
+								cout << endl;
 							}
 						}
-						else cout << "There isnt such data in this table" << endl;
+						else {
+							while (j < ind - 2) {
+								columnNames.push_back(proc[j]);
+								j++;
+							}
+							tables[i].rows[row[j]].columns[numb[0]]->display();
+								cout << tables[i].tableName << endl;
+								for (int j = 0; j < row.size(); j++) {
+									tables[i].rows[row[j]].columns[numb[0]]->display();
+									cout << endl;
+								}
+						}
 					}
-					else cout << "invalid argument after function WHERE" << endl;
+					else cout << "There isnt such data in this table" << endl;
 				}
-				else cout << "there isnt column with such name" << endl;
+				else cout << "invalid argument after function WHERE" << endl;
 			}
+			else cout << "there isnt column with such name" << endl;
+		}
+		if (tmp == 0) cout << "There is no table with that name." << endl;
+	}
+
+	void drop(vector<string> proc) {
+		int ind = findName(proc[1]);
+		if (ind == -1)
+			cout << "There is no table with such name." << endl;
+		else
+			tables.erase(tables.begin() + ind);
+	}
+
+	void deleteFrom(vector<string> proc) {
+		int ind = findName(proc[2]);
+		if (ind == -1)
+			cout << "There is no table with such name." << endl;
+		else
+			tables[ind].deleteData();
+	}
+
+	void deleteWhere(vector<string> proc) {
+		int ind = 3;
+		int tmp = 0;
+		int j = 1;
+		vector<string> columnNames;
+		int nam = findName(proc[ind - 1]);
+		if (nam != -1)
+		{
+			vector<string> st;
+			st.push_back(proc[ind + 1]);
+			vector<int> numb;
+			numb = tables[nam].rows[0].findColumn(st);
+			if (numb.size() != 0)
+			{
+				vector<bool> correct;
+				ifTypeSwitch(proc[ind + 3], nam, numb[0], correct);
+				tmp = 1;
+				if (correct.size() != 0) {
+					vector<int> row = tables[nam].whichRow(proc[ind + 3], numb[0]);
+					if (row.size() != 0) {
+						tables[nam].deleteRow(row);
+					}
+					else cout << "There isnt such data in this table" << endl;
+				}
+				else cout << "invalid argument after function WHERE" << endl;
+			}
+			else cout << "there isnt column with such name" << endl;
 		}
 		if (tmp == 0) cout << "There is no table with that name." << endl;
 	}
@@ -350,6 +405,5 @@ public:
 			positionRead++;
 			file >> tmp;
 		} 
-
 	}
 };

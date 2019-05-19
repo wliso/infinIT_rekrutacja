@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 #include "Row.h"
 using namespace std;
 
@@ -49,6 +50,32 @@ public:
 				roww.push_back(i);
 		}
 		return roww;
+	}
+	void deleteRow(vector<int> numRow) {
+		for (int i = numRow.size()-1; i >=0 ; i--) {
+			rows.erase(rows.begin() + numRow[i]);
+		}
+	}
+	void deleteData() {
+		int size = rows.size();
+		for (int i = 2; i < size; i++)
+			rows.pop_back();
+	}
+	void writeTableToFile() {
+		string name = tableName + ".txt";
+		ofstream file(name);
+
+		if (file)
+		{
+			file << displayTable() << endl;
+			file << 42.1337 << endl;
+			int age(23);
+			file << "Mam " << age << " lata." << endl;
+		}
+		else
+		{
+			cout << "B£¥D: nie mo¿na otworzyæ pliku." << endl;
+		}
 	}
 };
 
